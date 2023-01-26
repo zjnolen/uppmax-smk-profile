@@ -4,6 +4,7 @@
   - [About this fork](#about-this-fork)
     - [Why?](#why)
     - [How?](#how)
+    - [Set-up](#set-up)
   - [Introduction](#introduction)
   - [Alternatives](#alternatives)
   - [Quickstart](#quickstart)
@@ -62,6 +63,20 @@ folder customized to convert job resources to what the cluster expects and
 call other partitions when resources need them. This is *very* similar to how 
 the advanced argument conversion used to work in the profile, which has now 
 been deprecated.
+
+### Set-up
+
+Same as the original profile, but replace with this repo:
+
+    # create config directory that snakemake searches for profiles (or use something else)
+    profile_dir="${HOME}/.config/snakemake"
+    mkdir -p "$profile_dir"
+    # use cookiecutter to create the profile in the config directory
+    template="gh:zjnolen/uppmax-smk-profile"
+    cookiecutter --output-dir "$profile_dir" "$template"
+
+When prompted, select 'rackham' from the cluster specific profile options. 
+Everything else works the same as the original profile.
 
 ## Introduction
 
