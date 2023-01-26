@@ -37,3 +37,7 @@ class CookieCutter:
     @staticmethod
     def get_cluster_jobname() -> str:
         return "{{cookiecutter.cluster_jobname}}"
+    
+    @staticmethod
+    def get_cluster_profile() -> str:
+        return "{{cookiecutter.specific_cluster_profile}}"

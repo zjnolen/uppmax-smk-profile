@@ -5,7 +5,7 @@ Snakemake SLURM submit script.
 import json
 import logging
 import os
-
+import importlib.util
 import requests
 from snakemake.utils import read_job_properties
 
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 SIDECAR_VARS = os.environ.get("SNAKEMAKE_CLUSTER_SIDECAR_VARS", None)
 DEBUG = bool(int(os.environ.get("SNAKEMAKE_SLURM_DEBUG", "0")))
+SPECIFIC_CLUSTER_PROFILE = CookieCutter.get_cluster_profile()
 
 if DEBUG:
     logging.basicConfig(level=logging.DEBUG)
@@ -72,6 +73,11 @@ sbatch_options.update(job_properties.get("cluster", {}))
 if "time" in sbatch_options:
     duration = str(sbatch_options["time"])
     sbatch_options["time"] = str(slurm_utils.Time(duration))
+
+# 6) Modify parameters based on specific cluster profile
+if SPECIFIC_CLUSTER_PROFILE:
+    cluster_module = importlib.import_module("cluster_profiles."+SPECIFIC_CLUSTER_PROFILE)
+    sbatch_options = cluster_module.resource_conversion(sbatch_options)
 
 # 6) Format pattern in snakemake style
 sbatch_options = slurm_utils.format_values(sbatch_options, job_properties)

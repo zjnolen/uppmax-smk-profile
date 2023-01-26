@@ -12,6 +12,8 @@
     "cluster_sidecar_help": "Use cluster sidecar. NB! Requires snakemake >= 7.0! Enter to continue...",
     "cluster_sidecar": ["yes", "no"],
     "cluster_name": "",
+    "specific_cluster_profile_help": "If your cluster has a specific profile provided with this tool, you can select it and it will (attempt to) ensure jobs are submitted in the format your cluster expects. This is only possible for clusters where a profile has been prepared. Enter to continue...",
+    "specific_cluster_profile": ["No specific profile","rackham"],
     "cluster_jobname": "%r_%w",
     "cluster_logpath": "logs/slurm/%r/%j",
     "cluster_config_help": "The use of cluster-config is discouraged. Rather, set snakemake CLI options in the profile configuration file (see snakemake documentation on best practices). Enter to continue...",

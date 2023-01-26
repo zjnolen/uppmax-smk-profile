@@ -1,34 +1,67 @@
-![Test
-SnakemakeProfiles/slurm](https://github.com/Snakemake-Profiles/slurm/workflows/Test%20SnakemakeProfiles/slurm/badge.svg)
-
 # Contents
 
-- [Introduction](#introduction)
-- [Alternatives](#alternatives)
-- [Quickstart](#quickstart)
-- [Examples](#examples)
-    - [Example 1: project setup to use specific slurm
-      account](#example-1-project-setup-to-use-specific-slurm-account)
-    - [Example 2: project setup using a specified
-      cluster](#example-2-project-setup-using-a-specified-cluster)
-- [Profile details](#profile-details)
+- [Contents](#contents)
+  - [About this fork](#about-this-fork)
+    - [Why?](#why)
+    - [How?](#how)
+  - [Introduction](#introduction)
+  - [Alternatives](#alternatives)
+  - [Quickstart](#quickstart)
+  - [Examples](#examples)
+    - [Example 1: project setup to use specific slurm account](#example-1-project-setup-to-use-specific-slurm-account)
+    - [Example 2: project setup using a specified cluster](#example-2-project-setup-using-a-specified-cluster)
+  - [Profile details](#profile-details)
     - [Cookiecutter options](#cookiecutter-options)
+      - [Patterns](#patterns)
     - [Default snakemake arguments](#default-snakemake-arguments)
-    - [Parsing arguments to SLURM (sbatch) and resource
-      configuration](#parsing-arguments-to-slurm-sbatch-and-resource-configuration)
-    - [Rule specific resource
-      configuration](#rule-specific-resource-configuration)
-    - [Advanced argument conversion
-      (EXPERIMENTAL)](#advanced-argument-conversion-experimental)
+    - [Parsing arguments to SLURM (sbatch) and resource configuration](#parsing-arguments-to-slurm-sbatch-and-resource-configuration)
+    - [Rule specific resource configuration](#rule-specific-resource-configuration)
+      - [Human-friendly time](#human-friendly-time)
     - [Cluster configuration file](#cluster-configuration-file)
-- [Tests](#tests)
-    - [Testing on a HPC running
-      SLURM](#testing-on-a-hpc-running-slurm)
-    - [Testing on machine without
-      SLURM](#testing-on-machine-without-slurm)
+  - [Tests](#tests)
+    - [Testing on a HPC running SLURM](#testing-on-a-hpc-running-slurm)
+    - [Testing on machine without SLURM](#testing-on-machine-without-slurm)
     - [Baking cookies](#baking-cookies)
     - [Anatomy of the tests (WIP)](#anatomy-of-the-tests-wip)
     - [Adding new tests (WIP)](#adding-new-tests-wip)
+
+## About this fork
+
+This fork aims to allow a customizable Snakemake profile that plays well with 
+Uppmax's SLURM configuration. As Uppmax allots memory using CPUs, rather than 
+SLURM mem options, Snakemake's memory resources must be converted to CPUs, 
+else they essentially go ignored on rules that need more memory than reserved 
+CPUs would allot. Since it's very specific to Uppmax, here it is implemented 
+as a 'cluster specific profile' within the framework of the [Snakemake SLURM Profile](https://github.com/Snakemake-Profiles/slurm) 
+that it is a fork of. If this profile is set up with default settings, it 
+will function the same as the main one, but if a specific cluster configuration 
+is selected when asked, it will convert job resources to be compatible with 
+that cluster on submission.
+
+Right now, it only works on **Rackham** with jobs running across a **single node**. 
+I don't know enough about MPI jobs to make those work well, but if you do, 
+feel free to update the module. For now, it has worked on seems to work for 
+any job using no more than 20 CPUs and/or 1TB memory, which are the single 
+node limits for Rackham. It will automatically ask for fat nodes when needed 
+if the memory specification is in the rule.
+
+### Why?
+
+This makes pipelines written without Uppmax in mind easily convertible to its 
+needs without copious resource changes (it will probably still be needed, but 
+it at least will be about the data and not Uppmax). It also allows those, like 
+me, based on Uppmax, to write our pipelines in ways that better allocate 
+resources on other systems, while still working on Uppmax.
+
+### How?
+
+On job submission, if the profile is set up with a specific cluster 
+configuration, the [submission script]({{cookiecutter.profile_name}}/slurm-submit.py) 
+will perform a function defined in a module in the [cluster_profiles](cluster_profiles) 
+folder customized to convert job resources to what the cluster expects and 
+call other partitions when resources need them. This is *very* similar to how 
+the advanced argument conversion used to work in the profile, which has now 
+been deprecated.
 
 ## Introduction
 
